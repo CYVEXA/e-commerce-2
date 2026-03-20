@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - ShopEase{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, var(--secondary-color), #003d6b);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: 'Space Mono', monospace;
+    }
+
+    .recent-orders {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .admin-nav {
+        background: white;
+        border-radius: 20px;
+        padding: 1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+    }
+
+    .admin-nav .nav-link {
+        color: var(--dark);
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .admin-nav .nav-link:hover,
+    .admin-nav .nav-link.active {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1 class="fw-bold mb-2">
+        <i class="bi bi-speedometer2"></i> Admin Dashboard
+    </h1>
+    <p class="mb-0">Manage your e-commerce store</p>
+</div>
+
+<div class="admin-nav">
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'admin_dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_products' %}">
+                <i class="bi bi-box-seam"></i> Products
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_orders' %}">
+                <i class="bi bi-receipt"></i> Orders
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card animate-fade-in">
+            <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div class="stat-value text-primary">{{ total_products }}</div>
+            <p class="text-muted mb-0">Total Products</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card animate-fade-in" style="animation-delay: 100ms;">
+            <div class="stat-icon" style="background: #f3e5f5; color: #7b1fa2;">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <div class="stat-value" style="color: #7b1fa2;">{{ total_orders }}</div>
+            <p class="text-muted mb-0">Total Orders</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card animate-fade-in" style="animation-delay: 200ms;">
+            <div class="stat-icon" style="background: #fff3e0; color: #f57c00;">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="stat-value" style="color: #f57c00;">{{ pending_orders }}</div>
+            <p class="text-muted mb-0">Pending Orders</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card animate-fade-in" style="animation-delay: 300ms;">
+            <div class="stat-icon" style="background: #e8f5e9; color: #388e3c;">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stat-value" style="color: #388e3c;">₹{{ total_revenue }}</div>
+            <p class="text-muted mb-0">Total Revenue</p>
+        </div>
+    </div>
+</div>
+
+<div class="recent-orders">
+    <h4 class="fw-bold mb-3">
+        <i class="bi bi-clock-history"></i> Recent Orders
+    </h4>
+
+    {% if recent_orders %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                        <tr>
+                            <td class="fw-bold">#{{ order.id }}</td>
+                            <td>{{ order.customer_name }}</td>
+                            <td>{{ order.email }}</td>
+                            <td>{{ order.phone }}</td>
+                            <td class="fw-bold" style="color: var(--primary-color);">₹{{ order.total_amount }}</td>
+                            <td>
+                                {% if order.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif order.status == 'confirmed' %}
+                                    <span class="badge bg-info">Confirmed</span>
+                                {% elif order.status == 'shipped' %}
+                                    <span class="badge bg-primary">Shipped</span>
+                                {% elif order.status == 'delivered' %}
+                                    <span class="badge bg-success">Delivered</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'admin_order_detail' order.id %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-muted text-center py-4">No orders yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
