@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - ShopEase{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* HERO */
+.hero-section {
+    background: linear-gradient(135deg, #232f3e, #131921);
+    color: white;
+    padding: 50px;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* OFFER SLIDER */
+.offer-container {
+    max-width: 100%;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.offer-card {
+    padding-top: 15px;
+    display: none;
+}
+
+.offer-card.active {
+    display: block;
+}
+
+.offer-card img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+/* CATEGORY AMAZON STYLE */
+.category-box {
+    text-align: center;
+    transition: 0.3s;
+}
+
+.category-circle {
+    width: 90px;
+    height: 90px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transition: 0.3s;
+}
+
+.category-circle i {
+    font-size: 30px;
+    color: #ff6b35;
+}
+
+.category-box:hover .category-circle {
+    transform: scale(1.1);
+}
+
+.category-name {
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+/* PRODUCT CARD AMAZON STYLE */
+.product-card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: 0.3s;
+    background: #fff;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.product-image {
+    height: 220px;
+    object-fit: cover;
+}
+
+.product-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.product-price {
+    font-size: 18px;
+    color: #b12704;
+    font-weight: bold;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 25px 0;
+}
+
+/* BUTTON STYLE */
+.btn-cart {
+    background: #ffd814;
+    border: none;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-buy {
+    background: #ffa41c;
+    border: none;
+    width: 100%;
+    margin-top: 5px;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- OFFER SLIDER -->
+<div class="offer-container">
+    {% for offer in offers %}
+    <div class="offer-card">
+        {% if offer.image %}
+        <img src="{{ offer.image.url }}">
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<!-- HERO -->
+<div class="hero-section">
+    <h1>Welcome to ShopEase</h1>
+    <p>Best deals. Fast delivery. Trusted shopping.</p>
+</div>
+
+<!-- CATEGORIES -->
+<h2 class="section-title">Shop by Category</h2>
+
+<div class="row text-center">
+    {% for category in categories %}
+    <div class="col-6 col-md-3 mb-4">
+        <a href="{% url 'shop:category_products' category.id %}" class="text-decoration-none text-dark">
+            <div class="category-box">
+                <div class="category-circle">
+                    <i class="bi bi-grid-fill"></i>
+                </div>
+                <div class="category-name">{{ category.name }}</div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- PRODUCTS -->
+<h2 class="section-title">Featured Products</h2>
+
+<div class="row g-4">
+    {% for product in products %}
+    <div class="col-md-3">
+
+        <div class="card product-card p-2">
+
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="product-image w-100">
+            {% endif %}
+
+            <div class="p-2">
+                <div class="product-title">{{ product.name }}</div>
+                <div class="text-muted small">{{ product.description|truncatewords:10 }}</div>
+
+                <div class="product-price mt-1">₹{{ product.price }}</div>
+
+                {% if product.stock > 0 %}
+                <a href="{% url 'shop:add_to_cart' product.id %}" class="btn btn-cart">
+                    Add to Cart
+                </a>
+                <a href="{% url 'shop:buy_now' product.id %}" class="btn btn-buy">
+                    Buy Now
+                </a>
+                {% else %}
+                <button class="btn btn-secondary w-100 mt-2">Out of Stock</button>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+<!-- SLIDER SCRIPT -->
+<script>
+let index = 0;
+const slides = document.querySelectorAll(".offer-card");
+
+function showSlide() {
+    slides.forEach(s => s.style.display = "none");
+    slides[index].style.display = "block";
+}
+
+function nextSlide() {
+    index = (index + 1) % slides.length;
+    showSlide();
+}
+
+if (slides.length > 0) {
+    showSlide();
+    setInterval(nextSlide, 4000);
+}
+</script>
+
+{% endblock %}

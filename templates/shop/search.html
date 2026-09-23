@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Search Results for "{{ query }}"</h2>
+
+<div class="row">
+    {% for product in products %}
+        <div class="col-md-3">
+            <div class="card p-2">
+                <img src="{{ product.image.url }}" class="img-fluid">
+                <h5>{{ product.name }}</h5>
+                <p>₹{{ product.price }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p>No products found</p>
+    {% endfor %}
+</div>
+
+{% endblock %}
+</body>
+</html>

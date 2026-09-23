@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Add Product</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Product Name -->
+    <div class="mb-3">
+        <label>Product Name</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+
+    <!-- Price -->
+    <div class="mb-3">
+        <label>Price</label>
+        <input type="number" name="price" class="form-control" required>
+    </div>
+
+    <!-- Stock -->
+    <div class="mb-3">
+        <label>Stock Quantity</label>
+        <input type="number" name="stock" class="form-control" required>
+    </div>
+
+    <!-- Category Dropdown -->
+    <div class="mb-3">
+        <label>Select Category</label>
+        <select name="category" class="form-control">
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Add New Category -->
+    <div class="mb-3">
+        <label>Or Add New Category</label>
+        <input type="text" name="new_category" class="form-control" placeholder="Enter new category">
+    </div>
+
+    <!-- Multiple Images -->
+    <div class="mb-3">
+        <label>Upload Product Images</label>
+        <input type="file" name="images" class="form-control" multiple>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Product</button>
+</form>
+
+{% endblock %}

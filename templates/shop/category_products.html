@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>{{ category.name }} Products</h2>
+
+<div class="row">
+    {% for product in products %}
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>{{ product.name }}</h5>
+                <p>₹{{ product.price }}</p>
+
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" width="100%">
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
