@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - ShopEase{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .order-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        transform: translateY(-3px);
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .order-id {
+        font-family: 'Space Mono', monospace;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .order-items {
+        margin-top: 1rem;
+    }
+
+    .order-item {
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4 fw-bold">
+    <i class="bi bi-box-seam"></i> My Orders
+</h2>
+
+{% if orders %}
+    {% for order in orders %}
+        <div class="order-card animate-fade-in" style="animation-delay: {{ forloop.counter0 }}00ms;">
+            <div class="order-header">
+                <div>
+                    <span class="order-id">Order #{{ order.id }}</span>
+                    <p class="text-muted mb-0 small">
+                        <i class="bi bi-calendar"></i> {{ order.created_at|date:"F d, Y" }}
+                    </p>
+                </div>
+                <div>
+                    {% if order.status == 'pending' %}
+                        <span class="status-badge bg-warning text-dark">
+                            <i class="bi bi-clock"></i> Pending
+                        </span>
+                    {% elif order.status == 'confirmed' %}
+                        <span class="status-badge bg-info text-white">
+                            <i class="bi bi-check-circle"></i> Confirmed
+                        </span>
+                    {% elif order.status == 'shipped' %}
+                        <span class="status-badge bg-primary text-white">
+                            <i class="bi bi-truck"></i> Shipped
+                        </span>
+                    {% elif order.status == 'delivered' %}
+                        <span class="status-badge bg-success text-white">
+                            <i class="bi bi-box-seam"></i> Delivered
+                        </span>
+                    {% else %}
+                        <span class="status-badge bg-danger text-white">
+                            <i class="bi bi-x-circle"></i> Cancelled
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <h6 class="fw-bold mb-2">Order Items:</h6>
+                    <div class="order-items">
+                        {% for item in order.items.all %}
+                            <div class="order-item">
+                                <div class="d-flex justify-content-between">
+                                    <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                                    <span class="fw-bold">₹{{ item.get_total }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="text-end">
+                        <p class="mb-1"><strong>Customer:</strong> {{ order.customer_name }}</p>
+                        <p class="mb-1"><strong>Phone:</strong> {{ order.phone }}</p>
+                        <p class="mb-3"><strong>Email:</strong> {{ order.email }}</p>
+                        <h5 class="fw-bold" style="color: var(--primary-color);">
+                            Total: ₹{{ order.total_amount }}
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-inbox" style="font-size: 6rem; color: #ccc;"></i>
+        <h3 class="mt-4">No Orders Yet</h3>
+        <p class="text-muted mb-4">Start shopping to see your orders here!</p>
+        <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-bag-plus"></i> Start Shopping
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
